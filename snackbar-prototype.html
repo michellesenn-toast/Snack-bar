@@ -24,6 +24,10 @@
       position: relative;
       font-family: var(--snackbar-font);
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
     .snackbar {
       width: var(--snackbar-width);
@@ -103,16 +107,89 @@
     #delete-btn:hover, #delete-error-btn:hover, #delete-5-btn:hover, #delete-5-error-btn:hover {
       background: #0052cc;
     }
+    /* Context section styles */
+    .context-section {
+      width: 100vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      margin: 0;
+    }
+    .context-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .context-title {
+      color: #252525;
+      font-size: 38px;
+      font-family: 'Effra Medium', 'Source Sans Pro', Arial, sans-serif;
+      font-weight: 400;
+      line-height: 42px;
+      word-wrap: break-word;
+      text-align: center;
+    }
+    .context-subtitle {
+      color: #252525;
+      font-size: 16px;
+      font-family: 'Source Sans Pro', Arial, sans-serif;
+      font-weight: 400;
+      line-height: 24px;
+      letter-spacing: 0.20px;
+      word-wrap: break-word;
+      text-align: center;
+    }
+    .button-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-top: 0;
+      position: static;
+      left: unset;
+      top: unset;
+      transform: none;
+    }
+    #delete-btn, #delete-error-btn, #delete-5-btn, #delete-5-error-btn {
+      height: 40px;
+      padding: 11px 16px 13px 16px;
+      background: #2B4FB9;
+      border-radius: 8px;
+      font-size: 16px;
+      font-family: 'Source Sans Pro', Arial, sans-serif;
+      font-weight: 600;
+      line-height: 24px;
+      letter-spacing: 0.20px;
+      border: none;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #delete-btn:hover, #delete-error-btn:hover, #delete-5-btn:hover, #delete-5-error-btn:hover {
+      background: #0052cc;
+    }
   </style>
   <!-- Google Fonts: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="button-row">
-    <button id="delete-btn">Delete contact</button>
-    <button id="delete-error-btn">Delete contact (error)</button>
-    <button id="delete-5-btn">Delete 5 contacts</button>
-    <button id="delete-5-error-btn">Delete 5 contacts (error)</button>
+  <div class="context-section">
+    <div class="context-header">
+      <div class="context-title">Snackbar micro interactions</div>
+      <div class="context-subtitle">Try how the different snackbar states behave and interact with each other</div>
+    </div>
+    <div class="button-row">
+      <button id="delete-btn">Delete contact</button>
+      <button id="delete-error-btn">Delete contact (error)</button>
+      <button id="delete-5-btn">Delete 5 contacts</button>
+      <button id="delete-5-error-btn">Delete 5 contacts (error)</button>
+    </div>
   </div>
 
   <div class="snackbar-container" id="snackbar-container"></div>
@@ -166,7 +243,7 @@
       return snackbar;
     }
 
-    function createErrorSnackbar(message, viewLabel = 'View') {
+    function createErrorSnackbar(message, viewLabel = 'View profile') {
       const snackbar = document.createElement('div');
       snackbar.className = 'snackbar snackbar--hidden';
       snackbar.style.width = '343px';
@@ -320,7 +397,7 @@
         setTimeout(() => {
           snackbarContainer.removeChild(loadingSnackbar);
           // Create error snackbar
-          const errorSnackbar = createErrorSnackbar('Failed to delete contact');
+          const errorSnackbar = createErrorSnackbar('Failed to delete contact', 'View profile');
           snackbarContainer.appendChild(errorSnackbar);
           setTimeout(() => {
             errorSnackbar.classList.remove('snackbar--hidden');
@@ -430,7 +507,7 @@
           setTimeout(() => {
             [1, 2].forEach((_, idx) => {
               setTimeout(() => {
-                const errorSnackbar = createErrorSnackbar('Failed to delete contact');
+                const errorSnackbar = createErrorSnackbar('Failed to delete contact', 'View profile');
                 snackbarContainer.appendChild(errorSnackbar);
                 setTimeout(() => {
                   errorSnackbar.classList.remove('snackbar--hidden');
