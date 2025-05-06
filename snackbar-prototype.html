@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1728, initial-scale=1.0">
+  <title>Snackbar Prototype</title>
+  <style>
+    :root {
+      --color-neutral-gray-gray-110: #474747;
+      --text-color-text-default-inverse: #fff;
+      --snackbar-width: 343px;
+      --snackbar-radius: 8px;
+      --snackbar-padding-x: 16px;
+      --snackbar-padding-y: 12px;
+      --snackbar-font: 'Source Sans Pro', Arial, sans-serif;
+    }
+    body {
+      margin: 0;
+      background: #F0F0F2;
+      width: 100vw;
+      height: 100vh;
+      min-height: 100vh;
+      min-width: 100vw;
+      position: relative;
+      font-family: var(--snackbar-font);
+      overflow: hidden;
+    }
+    .snackbar {
+      width: var(--snackbar-width);
+      padding: var(--snackbar-padding-y) var(--snackbar-padding-x);
+      background: var(--color-neutral-gray-gray-110);
+      color: var(--text-color-text-default-inverse);
+      border-radius: var(--snackbar-radius);
+      box-shadow: 0px 2px 4px -1px rgba(0, 0, 0, 0.09);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: 1021px;
+      font-size: 16px;
+      line-height: 24px;
+      letter-spacing: 0.2px;
+      z-index: 100;
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s cubic-bezier(0.4,0,0.2,1);
+      opacity: 1;
+      transform: translateY(0);
+      margin-bottom: 12px;
+      position: relative;
+      left: 0;
+      top: 0;
+    }
+    .snackbar--hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(40px);
+    }
+    .snackbar--show {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .snackbar-message {
+      width: 200px;
+      font-weight: 400;
+      word-wrap: break-word;
+    }
+    .snackbar-container {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 48px;
+      display: flex;
+      flex-direction: column-reverse;
+      align-items: center;
+      z-index: 200;
+      pointer-events: none;
+    }
+    .snackbar-container > .snackbar {
+      pointer-events: auto;
+    }
+    #delete-btn {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      padding: 16px 32px;
+      font-size: 18px;
+      border-radius: 8px;
+      border: none;
+      background: #0066FF;
+      color: #fff;
+      font-family: 'Source Sans Pro', Arial, sans-serif;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      transition: background 0.2s;
+    }
+    #delete-btn:hover {
+      background: #0052cc;
+    }
+  </style>
+  <!-- Google Fonts: Source Sans Pro -->
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <button id="delete-btn">Delete</button>
+
+  <div class="snackbar-container" id="snackbar-container"></div>
+
+  <script>
+    const deleteBtn = document.getElementById('delete-btn');
+    const snackbarContainer = document.getElementById('snackbar-container');
+
+    function createSnackbar(type, message) {
+      const snackbar = document.createElement('div');
+      snackbar.className = 'snackbar snackbar--hidden';
+      snackbar.style.width = '343px';
+      snackbar.style.borderRadius = '8px';
+      snackbar.style.boxShadow = '0px 2px 4px -1px rgba(0, 0, 0, 0.09)';
+      snackbar.style.display = 'flex';
+      snackbar.style.justifyContent = 'space-between';
+      snackbar.style.alignItems = 'flex-start';
+      snackbar.style.padding = '12px 16px';
+      snackbar.style.fontSize = '16px';
+      snackbar.style.lineHeight = '24px';
+      snackbar.style.letterSpacing = '0.2px';
+      snackbar.style.fontFamily = 'Source Sans Pro, Arial, sans-serif';
+      snackbar.style.marginBottom = '12px';
+      snackbar.style.background = type === 'success' ? '#227800' : '#474747';
+      snackbar.style.color = '#fff';
+      // Content
+      if (type === 'loading') {
+        snackbar.innerHTML = `
+          <div class="snackbar-message" style="width: 200px;"><span class="loading-text">Deleting contact</span></div>
+          <div style="display: flex; align-items: center; gap: 16px;"></div>
+        `;
+      } else if (type === 'success') {
+        snackbar.innerHTML = `
+          <div style="display: flex; align-items: flex-start; gap: 8px;">
+            <span style="position: relative; display: flex; align-items: center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M8 12.25L10.85 15.5L13.475 12L16.1 8.5M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+            <div style="width: 180px; color: #fff; font-size: 16px; font-family: Source Sans Pro; font-weight: 400; line-height: 24px; letter-spacing: 0.20px; word-wrap: break-word">Contact deleted</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 16px; cursor: pointer;" class="snackbar-close">
+            <span style="position: relative; display: flex; align-items: center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5.50012 5.5L18.5001 18.5M18.5001 5.5L5.50012 18.5" stroke="white" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </div>
+        `;
+      }
+      return snackbar;
+    }
+
+    function showStackedSnackbar() {
+      // Create loading snackbar
+      const loadingSnackbar = createSnackbar('loading');
+      snackbarContainer.appendChild(loadingSnackbar);
+      setTimeout(() => {
+        loadingSnackbar.classList.remove('snackbar--hidden');
+        loadingSnackbar.classList.add('snackbar--show');
+      }, 10);
+
+      // Animate loading dots
+      let dotCount = 0;
+      const loadingText = loadingSnackbar.querySelector('.loading-text');
+      let loadingDotsInterval = setInterval(() => {
+        dotCount = (dotCount + 1) % 4;
+        loadingText.textContent = 'Deleting contact' + '.'.repeat(dotCount);
+      }, 400);
+
+      // After 3s, replace with success snackbar
+      setTimeout(() => {
+        clearInterval(loadingDotsInterval);
+        // Animate out loading
+        loadingSnackbar.classList.remove('snackbar--show');
+        loadingSnackbar.classList.add('snackbar--hidden');
+        setTimeout(() => {
+          snackbarContainer.removeChild(loadingSnackbar);
+          // Create success snackbar
+          const successSnackbar = createSnackbar('success');
+          snackbarContainer.appendChild(successSnackbar);
+          setTimeout(() => {
+            successSnackbar.classList.remove('snackbar--hidden');
+            successSnackbar.classList.add('snackbar--show');
+          }, 10);
+          // Auto-dismiss after 3s
+          const autoDismiss = setTimeout(() => {
+            successSnackbar.classList.remove('snackbar--show');
+            successSnackbar.classList.add('snackbar--hidden');
+            setTimeout(() => {
+              if (successSnackbar.parentNode === snackbarContainer) {
+                snackbarContainer.removeChild(successSnackbar);
+              }
+            }, 350);
+          }, 3000);
+          // Dismiss on close click
+          successSnackbar.querySelector('.snackbar-close').addEventListener('click', () => {
+            clearTimeout(autoDismiss);
+            successSnackbar.classList.remove('snackbar--show');
+            successSnackbar.classList.add('snackbar--hidden');
+            setTimeout(() => {
+              if (successSnackbar.parentNode === snackbarContainer) {
+                snackbarContainer.removeChild(successSnackbar);
+              }
+            }, 350);
+          });
+        }, 350);
+      }, 3000);
+    }
+
+    deleteBtn.addEventListener('click', showStackedSnackbar);
+  </script>
+</body>
+</html> 
