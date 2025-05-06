@@ -80,11 +80,15 @@
     .snackbar-container > .snackbar {
       pointer-events: auto;
     }
-    #delete-btn {
+    .button-row {
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
+      display: flex;
+      gap: 16px;
+    }
+    #delete-btn, #delete-error-btn {
       padding: 16px 32px;
       font-size: 18px;
       border-radius: 8px;
@@ -96,7 +100,7 @@
       box-shadow: 0 2px 8px rgba(0,0,0,0.04);
       transition: background 0.2s;
     }
-    #delete-btn:hover {
+    #delete-btn:hover, #delete-error-btn:hover {
       background: #0052cc;
     }
   </style>
@@ -104,7 +108,10 @@
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <button id="delete-btn">Delete</button>
+  <div class="button-row">
+    <button id="delete-btn">Delete</button>
+    <button id="delete-error-btn">Delete error</button>
+  </div>
 
   <div class="snackbar-container" id="snackbar-container"></div>
 
@@ -154,6 +161,48 @@
           </div>
         `;
       }
+      return snackbar;
+    }
+
+    function createErrorSnackbar() {
+      const snackbar = document.createElement('div');
+      snackbar.className = 'snackbar snackbar--hidden';
+      snackbar.style.width = '343px';
+      snackbar.style.borderRadius = '8px';
+      snackbar.style.boxShadow = '0px 2px 4px -1px rgba(0, 0, 0, 0.09)';
+      snackbar.style.display = 'flex';
+      snackbar.style.justifyContent = 'space-between';
+      snackbar.style.alignItems = 'flex-start';
+      snackbar.style.padding = '12px 16px';
+      snackbar.style.fontSize = '16px';
+      snackbar.style.lineHeight = '24px';
+      snackbar.style.letterSpacing = '0.2px';
+      snackbar.style.fontFamily = 'Source Sans Pro, Arial, sans-serif';
+      snackbar.style.marginBottom = '12px';
+      snackbar.style.background = '#B4001E';
+      snackbar.style.color = '#fff';
+      snackbar.innerHTML = `
+        <div style="display: flex; align-items: flex-start; gap: 8px;">
+          <span style="position: relative; display: flex; align-items: center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10.0273 4.62335C10.9281 3.12555 13.0299 3.12555 13.9306 4.62335L17.934 11.0139L21.6372 17.0051C22.638 18.5029 21.437 20.5 19.6355 20.5H11.9289H4.32245C2.52091 20.5 1.41998 18.5029 2.32074 17.0051L6.0239 11.0139L10.0273 4.62335Z" stroke="white" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M11.929 8.51758V13.011" stroke="white" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M11.9288 17.5674C12.4816 17.5674 12.9297 17.1203 12.9297 16.5688C12.9297 16.0174 12.4816 15.5703 11.9288 15.5703C11.3761 15.5703 10.928 16.0174 10.928 16.5688C10.928 17.1203 11.3761 17.5674 11.9288 17.5674Z" fill="white"/>
+            </svg>
+          </span>
+          <div style="width: 180px; color: #fff; font-size: 16px; font-family: Source Sans Pro; font-weight: 400; line-height: 24px; letter-spacing: 0.20px; word-wrap: break-word">Failed to delete contact</div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <div style="color: #fff; font-size: 16px; font-family: Source Sans Pro; font-weight: 600; text-decoration: underline; line-height: 24px; letter-spacing: 0.20px; word-wrap: break-word; cursor: pointer;">View</div>
+          </div>
+          <span style="position: relative; display: flex; align-items: center; cursor: pointer;" class="snackbar-close">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5.50012 5.5L18.5001 18.5M18.5001 5.5L5.50012 18.5" stroke="white" stroke-width="1.5" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+        </div>
+      `;
       return snackbar;
     }
 
@@ -214,7 +263,52 @@
       }, 3000);
     }
 
+    function showErrorStackedSnackbar() {
+      // Create loading snackbar
+      const loadingSnackbar = createSnackbar('loading');
+      snackbarContainer.appendChild(loadingSnackbar);
+      setTimeout(() => {
+        loadingSnackbar.classList.remove('snackbar--hidden');
+        loadingSnackbar.classList.add('snackbar--show');
+      }, 10);
+      // Animate loading dots
+      let dotCount = 0;
+      const loadingText = loadingSnackbar.querySelector('.loading-text');
+      let loadingDotsInterval = setInterval(() => {
+        dotCount = (dotCount + 1) % 4;
+        loadingText.textContent = 'Deleting contact' + '.'.repeat(dotCount);
+      }, 400);
+      // After 3s, replace with error snackbar
+      setTimeout(() => {
+        clearInterval(loadingDotsInterval);
+        // Animate out loading
+        loadingSnackbar.classList.remove('snackbar--show');
+        loadingSnackbar.classList.add('snackbar--hidden');
+        setTimeout(() => {
+          snackbarContainer.removeChild(loadingSnackbar);
+          // Create error snackbar
+          const errorSnackbar = createErrorSnackbar();
+          snackbarContainer.appendChild(errorSnackbar);
+          setTimeout(() => {
+            errorSnackbar.classList.remove('snackbar--hidden');
+            errorSnackbar.classList.add('snackbar--show');
+          }, 10);
+          // Dismiss on close click
+          errorSnackbar.querySelector('.snackbar-close').addEventListener('click', () => {
+            errorSnackbar.classList.remove('snackbar--show');
+            errorSnackbar.classList.add('snackbar--hidden');
+            setTimeout(() => {
+              if (errorSnackbar.parentNode === snackbarContainer) {
+                snackbarContainer.removeChild(errorSnackbar);
+              }
+            }, 350);
+          });
+        }, 350);
+      }, 3000);
+    }
+
     deleteBtn.addEventListener('click', showStackedSnackbar);
+    document.getElementById('delete-error-btn').addEventListener('click', showErrorStackedSnackbar);
   </script>
 </body>
 </html> 
